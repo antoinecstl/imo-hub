@@ -9,3 +9,4 @@ export * from './ademe/connector.ts';
 export * from './pap/transport.ts';
 export * from './pap/parse.ts';
 export * from './pap/connector.ts';
+export * from './http/guarded.ts';

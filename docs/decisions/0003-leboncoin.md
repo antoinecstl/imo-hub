@@ -30,3 +30,6 @@ Constats vérifiés dans le code :
 1. Décision écrite sur les CGU de Leboncoin et les droits de réutilisation (la licence ISC du code n'en donne aucun).
 2. Source passée à `access_status = 'authorized'` en base ; le pipeline refuse sinon toute collecte par un transport réel.
 3. Transport réel avec délais, concurrence 1, temporisation, et arrêt au premier refus ou challenge. Aucun contournement.
+
+## Mise à jour du 13/10/2026
+Un transport réel borné existe désormais (`LiveLbcTransport`, décision 0006). Il reste inactif tant que la source n'est pas autorisée en base.

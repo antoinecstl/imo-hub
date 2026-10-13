@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import type { ResponseRecorder } from '../http/guarded.ts';
 
 export interface AdemeHttpResponse {
   status: number;
@@ -14,9 +15,10 @@ export interface AdemeTransport {
 /** Accès HTTP réel à l'API data-fair de l'ADEME (données publiques sous Licence Ouverte 2.0). */
 export class HttpAdemeTransport implements AdemeTransport {
   private last = 0;
+  private first = true;
 
   constructor(
-    private readonly opts: { timeoutMs?: number; minIntervalMs?: number; userAgent?: string } = {},
+    private readonly opts: { timeoutMs?: number; minIntervalMs?: number; userAgent?: string; recorder?: ResponseRecorder } = {},
   ) {}
 
   async get(url: string): Promise<AdemeHttpResponse> {
@@ -29,7 +31,17 @@ export class HttpAdemeTransport implements AdemeTransport {
       signal: AbortSignal.timeout(this.opts.timeoutMs ?? 30_000),
     });
     const contentType = res.headers.get('content-type') ?? '';
-    const body = contentType.includes('json') ? await res.json().catch(() => null) : await res.text();
+    const text = await res.text();
+    await this.opts.recorder?.save(this.first ? '__first__' : url, { status: res.status, contentType, text });
+    this.first = false;
+    let body: unknown = text;
+    if (contentType.includes('json')) {
+      try {
+        body = JSON.parse(text);
+      } catch {
+        body = null;
+      }
+    }
     return { status: res.status, contentType, body };
   }
 }

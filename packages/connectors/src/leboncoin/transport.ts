@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import type { GuardedHttpClient, ResponseRecorder } from '../http/guarded.ts';
 
 export interface LbcSearchRequest {
   locations: string[];
@@ -48,11 +49,50 @@ export class FixtureTransport implements LbcTransport {
 }
 
 /**
- * Aucun transport réel n'est fourni à ce stade : l'accès à Leboncoin n'est pas qualifié
- * (conditions d'utilisation, droits de réutilisation, CAPTCHA signalé par le dépôt tiers).
- * Un transport réel ne sera écrit qu'après validation (cf. docs/decisions/0003-leboncoin.md),
- * et il devra s'arrêter sur tout refus ou challenge, sans tentative de contournement.
+ * Transport réel vers l'API de recherche Leboncoin (endpoint utilisé par le dépôt tiers).
+ * Pas de clé d'application, de cookie anti-robot ni de User-Agent d'application emprunté :
+ * un refus ou un CAPTCHA est remonté tel quel et arrête la source (voir docs/decisions/0006-tests-reels.md).
  */
-export function createLiveTransport(): never {
-  throw new Error('Transport Leboncoin réel non disponible : accès non qualifié (voir docs/decisions/0003-leboncoin.md)');
+export class LiveLbcTransport implements LbcTransport {
+  readonly live = true;
+
+  constructor(
+    private readonly http: GuardedHttpClient,
+    private readonly recorder?: ResponseRecorder,
+  ) {}
+
+  async search(request: LbcSearchRequest): Promise<LbcHttpResponse> {
+    const ranges: Record<string, unknown> = {};
+    if (request.priceMin !== null || request.priceMax !== null) {
+      ranges.price = { ...(request.priceMin !== null ? { min: request.priceMin } : {}), ...(request.priceMax !== null ? { max: request.priceMax } : {}) };
+    }
+    const body = {
+      filters: {
+        category: { id: request.category },
+        enums: { ad_type: ['offer'] },
+        ranges,
+        location: { locations: request.locations.map((zipcode) => ({ locationType: 'city', zipcode })) },
+      },
+      limit: request.limit,
+      ...(request.pivot ? { pivot: request.pivot } : {}),
+      owner_type: request.ownerType,
+      sort_by: 'time',
+      sort_order: 'desc',
+    };
+    const res = await this.http.request('https://api.leboncoin.fr/finder/search', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify(body),
+    });
+    await this.recorder?.save(request.pivot ?? '__first__', res);
+    let parsed: unknown = res.text;
+    if (res.contentType.includes('json')) {
+      try {
+        parsed = JSON.parse(res.text);
+      } catch {
+        parsed = res.text;
+      }
+    }
+    return { status: res.status, contentType: res.contentType, body: parsed };
+  }
 }

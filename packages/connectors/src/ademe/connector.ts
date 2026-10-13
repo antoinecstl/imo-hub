@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { NormalizedDpe, type Connector, type ConnectorResult } from '@imo/contracts';
 
 type EnergyClass = NonNullable<NormalizedDpe['energyClass']>;
-import { connectorError, sha256, stableStringify } from '../util.ts';
+import { accessFailure, connectorError, sha256, stableStringify } from '../util.ts';
 import type { AdemeTransport } from './transport.ts';
 
 export const ADEME_SOURCE_ID = 'ademe-dpe-logements';
@@ -195,7 +195,7 @@ export class AdemeDpeConnector implements Connector<AdemeScope> {
     try {
       res = await this.transport.get(cursor ?? firstPageUrl(scope));
     } catch (err) {
-      return { ...result, status: 'failed', nextCursor: cursor, errors: [connectorError('network', (err as Error).message, page)] };
+      return accessFailure(result, err, cursor, page);
     }
     if (res.status === 429) return { ...result, status: 'blocked', nextCursor: cursor, errors: [connectorError('rate_limited', 'HTTP 429 : quota de l’API ADEME atteint', page)] };
     if (res.status === 401 || res.status === 403) return { ...result, status: 'blocked', nextCursor: cursor, errors: [connectorError('forbidden', `HTTP ${res.status}`, page)] };

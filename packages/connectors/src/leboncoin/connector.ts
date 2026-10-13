@@ -1,6 +1,6 @@
 import type { Connector, ConnectorResult, NormalizedListing } from '@imo/contracts';
 import { NormalizedListing as NormalizedListingSchema } from '@imo/contracts';
-import { connectorError, sha256, stableStringify } from '../util.ts';
+import { accessFailure, connectorError, sha256, stableStringify } from '../util.ts';
 import { LBC_PARSER_VERSION, LBC_SOURCE_ID, normalizeLbcAd } from './normalize.ts';
 import { LbcAd, LbcSearchResponse } from './schema.ts';
 import type { LbcHttpResponse, LbcTransport } from './transport.ts';
@@ -58,7 +58,7 @@ export class LeboncoinConnector implements Connector<LbcScope> {
 
   async health() {
     return this.transport.live
-      ? { ok: false, detail: 'transport réel non qualifié' }
+      ? { ok: false, detail: 'transport réel : soumis à access_status = authorized' }
       : { ok: true, detail: 'transport de fixtures (hors ligne)' };
   }
 
@@ -77,7 +77,7 @@ export class LeboncoinConnector implements Connector<LbcScope> {
         pivot: cursor,
       });
     } catch (err) {
-      return { ...result, status: 'failed', nextCursor: cursor, errors: [connectorError('network', (err as Error).message, page)] };
+      return accessFailure(result, err, cursor, page);
     }
 
     if (res.status === 403 || res.status === 401) {
