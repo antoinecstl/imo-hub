@@ -1,7 +1,7 @@
 import Fastify, { type FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import type { Db } from '@imo/db';
-import { fieldCompleteness, getListing, listListings, ListingsQuery, listRuns, listSources } from './queries.ts';
+import { DpeQuery, dpeFreshness, fieldCompleteness, getDpe, getListing, listDpe, listListings, ListingsQuery, listRuns, listSources } from './queries.ts';
 import { renderListingPage, renderTechnicalPage } from './pages.ts';
 
 const Uuid = z.string().uuid();
@@ -37,15 +37,25 @@ export function buildApp(db: Db): FastifyInstance {
     return { items: await listRuns(db, q) };
   });
 
+  app.get('/api/dpe', async (req) => listDpe(db, DpeQuery.parse(req.query)));
+
+  app.get('/api/dpe/:numero', async (req, reply) => {
+    const numero = (req.params as { numero: string }).numero.toUpperCase();
+    const dpe = /^[0-9A-Z]{13}$/.test(numero) ? await getDpe(db, numero) : null;
+    return dpe ?? reply.status(404).send({ error: 'DPE introuvable' });
+  });
+
+  app.get('/api/quality/dpe-freshness', async () => ({ items: await dpeFreshness(db) }));
+
   app.get('/api/quality/completeness', async () => ({ items: await fieldCompleteness(db) }));
 
   // Page technique : état des sources, dernières collectes, complétude et annonces.
   app.get('/', async (req, reply) => {
     const q = ListingsQuery.parse(req.query);
-    const [sources, runs, completeness, listings] = await Promise.all([
-      listSources(db), listRuns(db, { limit: 20 }), fieldCompleteness(db), listListings(db, q),
+    const [sources, runs, completeness, listings, dpe] = await Promise.all([
+      listSources(db), listRuns(db, { limit: 20 }), fieldCompleteness(db), listListings(db, q), dpeFreshness(db),
     ]);
-    return reply.type('text/html; charset=utf-8').send(renderTechnicalPage({ sources, runs, completeness, listings, query: req.query as Record<string, string> }));
+    return reply.type('text/html; charset=utf-8').send(renderTechnicalPage({ sources, runs, completeness, listings, dpe, query: req.query as Record<string, string> }));
   });
 
   app.get('/listings/:id', async (req, reply) => {

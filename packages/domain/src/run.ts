@@ -1,6 +1,7 @@
 import type { Connector, ConnectorError, ConnectorResult, RejectedItem, TerminalRunStatus } from '@imo/contracts';
 import { withTransaction, type Db } from '@imo/db';
-import { ingestListing } from './ingest.ts';
+import { ingestListing, type IngestOutcome } from './ingest.ts';
+import { ingestDpe } from './ingest-dpe.ts';
 
 export interface RunOptions {
   /** Reprendre une collecte interrompue à partir de son dernier curseur. */
@@ -57,11 +58,14 @@ function summary(row: RunRow, sourceId: string, alreadyDone: boolean): RunSummar
 }
 
 export async function ensureSource(db: Db, connector: Connector<any>) {
+  // Une source sous licence ouverte est autorisée dès sa création ; sinon l'accès reste à qualifier.
+  const licence = connector.source.openLicence ?? null;
   const { rows } = await db.query<{ enabled: boolean; access_status: string }>(
-    `INSERT INTO sources (id, name, kind, connector_version) VALUES ($1, $2, $3, $4)
+    `INSERT INTO sources (id, name, kind, connector_version, access_status, rights_note)
+     VALUES ($1, $2, $3, $4, CASE WHEN $5::text IS NULL THEN 'unverified' ELSE 'authorized' END, $5)
      ON CONFLICT (id) DO UPDATE SET connector_version = EXCLUDED.connector_version, updated_at = now()
      RETURNING enabled, access_status`,
-    [connector.source.id, connector.source.name, connector.source.kind, connector.version],
+    [connector.source.id, connector.source.name, connector.source.kind, connector.version, licence],
   );
   return rows[0]!;
 }
@@ -153,8 +157,14 @@ export async function runCollection<S>(db: Db, connector: Connector<S>, scope: S
     const ctx = { runId: run.id, scopeKey, observedAt: run.observed_at, parserVersion: connector.version };
     await withTransaction(db, async (c) => {
       const counts = { seen: 0, created: 0, updated: 0, unchanged: 0 };
+      const outcomes: IngestOutcome[] = [];
       for (const listing of result.listings) {
-        const outcome = await ingestListing(c, listing, result.raw[listing.externalId]?.hash ?? '', ctx);
+        outcomes.push(await ingestListing(c, listing, result.raw[listing.externalId]?.hash ?? '', ctx));
+      }
+      for (const dpe of result.dpeRecords ?? []) {
+        outcomes.push(await ingestDpe(c, dpe, result.raw[dpe.dpeNumber]?.hash ?? '', ctx));
+      }
+      for (const outcome of outcomes) {
         if (outcome === 'duplicate_in_run') continue;
         counts.seen += 1;
         counts[outcome] += 1;

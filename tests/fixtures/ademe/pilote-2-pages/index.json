@@ -1,0 +1,8 @@
+{
+  "__first__": {
+    "file": "page-1.json"
+  },
+  "https://data.ademe.fr/data-fair/api/v1/datasets/meg-83tjwtg8dyz4vv7h1dqe/lines?after=fixture-page-2&size=4": {
+    "file": "page-2.json"
+  }
+}

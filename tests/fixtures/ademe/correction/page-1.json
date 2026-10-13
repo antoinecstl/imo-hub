@@ -1,0 +1,31 @@
+{
+  "total": 1,
+  "results": [
+    {
+      "numero_dpe": "2606E2535225C",
+      "type_batiment": "appartement",
+      "surface_habitable_logement": 59.7,
+      "etiquette_dpe": "D",
+      "conso_5_usages_par_m2_ep": 181.0,
+      "etiquette_ges": "C",
+      "emission_ges_5_usages_par_m2": 18.0,
+      "modele_dpe": "DPE 3CL 2021 méthode logement",
+      "methode_application_dpe": "dpe appartement individuel",
+      "date_visite_diagnostiqueur": "2026-10-05",
+      "date_etablissement_dpe": "2026-10-05",
+      "date_reception_dpe": "2026-10-05",
+      "date_derniere_modification_dpe": "2026-10-09",
+      "date_fin_validite_dpe": "2036-10-05",
+      "adresse_brut": "140 Chemin de la Costière",
+      "adresse_ban": "140 Chemin de la Costière 06000 Nice",
+      "code_postal_brut": 6000,
+      "statut_geocodage": "adresse géocodée ban à l'adresse",
+      "code_insee_ban": "06088",
+      "code_postal_ban": "06000",
+      "nom_commune_ban": "Nice",
+      "_geopoint": "43.7151,7.2475",
+      "score_ban": 0.9,
+      "complement_adresse_logement": "2eme droite"
+    }
+  ]
+}

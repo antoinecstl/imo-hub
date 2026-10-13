@@ -115,3 +115,77 @@ export async function fieldCompleteness(db: Db) {
   );
   return rows;
 }
+
+export const DpeQuery = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(200).default(50),
+  insee: z.string().regex(/^[0-9AB]{5}$/).optional(),
+  postalCode: z.string().regex(/^\d{5}$/).optional(),
+  energyClass: z.enum(['A', 'B', 'C', 'D', 'E', 'F', 'G']).optional(),
+  buildingType: z.enum(['apartment', 'house', 'building']).optional(),
+  receivedSince: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  geocoded: z.enum(['true', 'false']).optional(),
+  /** Inclure les DPE remplacés par un DPE plus récent (exclus par défaut). */
+  includeReplaced: z.enum(['true', 'false']).default('false'),
+});
+export type DpeQuery = z.infer<typeof DpeQuery>;
+
+const DPE_COLUMNS = `d.dpe_number AS "dpeNumber", d.building_type AS "buildingType", d.living_area AS "livingArea",
+  d.energy_class AS "energyClass", d.ges_class AS "gesClass", d.established_at::text AS "establishedAt",
+  d.received_at::text AS "receivedAt", d.last_modified_at::text AS "lastModifiedAt", d.insee_code AS "inseeCode",
+  d.postal_code AS "postalCode", d.raw_postal_code AS "rawPostalCode", d.address_ban AS "addressBan",
+  d.geocoding_status AS "geocodingStatus", ST_Y(d.location::geometry) AS latitude, ST_X(d.location::geometry) AS longitude,
+  d.replaces_dpe_number AS "replacesDpeNumber", d.replaced_by_dpe_number AS "replacedByDpeNumber",
+  d.first_seen_at AS "firstSeenAt", d.last_seen_at AS "lastSeenAt"`;
+
+export async function listDpe(db: Db, q: DpeQuery) {
+  const where: string[] = [];
+  const params: unknown[] = [];
+  const add = (sql: string, value: unknown) => {
+    params.push(value);
+    where.push(sql.replace('?', `$${params.length}`));
+  };
+  if (q.insee) add('d.insee_code = ?', q.insee);
+  if (q.postalCode) add('coalesce(d.postal_code, d.raw_postal_code) = ?', q.postalCode);
+  if (q.energyClass) add('d.energy_class = ?', q.energyClass);
+  if (q.buildingType) add('d.building_type = ?', q.buildingType);
+  if (q.receivedSince) add('d.received_at >= ?::date', q.receivedSince);
+  if (q.geocoded) where.push(q.geocoded === 'true' ? 'd.location IS NOT NULL' : 'd.location IS NULL');
+  if (q.includeReplaced === 'false') where.push('d.replaced_by_dpe_number IS NULL');
+  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+  const total = await db.query<{ n: number }>(`SELECT count(*)::int AS n FROM dpe_records d ${whereSql}`, params);
+  const { rows } = await db.query(
+    `SELECT ${DPE_COLUMNS} FROM dpe_records d ${whereSql}
+      ORDER BY d.received_at DESC NULLS LAST, d.dpe_number LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+    [...params, q.pageSize, (q.page - 1) * q.pageSize],
+  );
+  const n = total.rows[0]!.n;
+  return { items: rows, page: q.page, pageSize: q.pageSize, total: n, totalPages: Math.ceil(n / q.pageSize) };
+}
+
+export async function getDpe(db: Db, dpeNumber: string) {
+  const { rows } = await db.query(
+    `SELECT ${DPE_COLUMNS}, v.data AS current FROM dpe_records d JOIN dpe_record_versions v ON v.id = d.current_version_id
+      WHERE d.dpe_number = $1`,
+    [dpeNumber],
+  );
+  if (!rows[0]) return null;
+  const versions = await db.query(
+    `SELECT v.observed_at AS "observedAt", v.run_id AS "runId", v.data FROM dpe_record_versions v
+       JOIN dpe_records d ON d.id = v.dpe_record_id WHERE d.dpe_number = $1 ORDER BY v.observed_at DESC`,
+    [dpeNumber],
+  );
+  return { ...rows[0], versions: versions.rows };
+}
+
+/** Volumes et fraîcheur des DPE par commune : base du contrôle de latence ADEME. */
+export async function dpeFreshness(db: Db) {
+  const { rows } = await db.query(
+    `SELECT insee_code AS "inseeCode", count(*)::int AS total,
+            count(*) FILTER (WHERE location IS NULL)::int AS "notGeocoded",
+            count(*) FILTER (WHERE replaced_by_dpe_number IS NOT NULL)::int AS replaced,
+            max(received_at)::text AS "lastReceivedAt", max(last_modified_at)::text AS "lastModifiedAt"
+       FROM dpe_records GROUP BY insee_code ORDER BY insee_code NULLS LAST`,
+  );
+  return rows;
+}

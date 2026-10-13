@@ -9,7 +9,7 @@ export async function setupDb(): Promise<Db> {
 }
 
 export async function resetDb(db: Db) {
-  await db.query('TRUNCATE listing_events, listing_observations, listings, listing_snapshots, collection_runs, sources RESTART IDENTITY CASCADE');
+  await db.query('TRUNCATE dpe_observations, dpe_records, dpe_record_versions, listing_events, listing_observations, listings, listing_snapshots, collection_runs, sources RESTART IDENTITY CASCADE');
 }
 
 export async function count(db: Db, table: string, where = 'true', params: unknown[] = []): Promise<number> {

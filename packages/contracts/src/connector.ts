@@ -13,6 +13,11 @@ export interface SourceDescriptor {
   id: string;
   name: string;
   kind: 'portal' | 'file_import' | 'public_data';
+  /**
+   * Licence ouverte couvrant la réutilisation (ex. « Licence Ouverte 2.0 »). Une source sous licence
+   * ouverte est enregistrée avec access_status = 'authorized' et la licence en note de droits.
+   */
+  openLicence?: string;
 }
 
 export interface ConnectorHealth {
