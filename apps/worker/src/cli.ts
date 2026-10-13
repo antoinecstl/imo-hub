@@ -1,3 +1,4 @@
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import {
@@ -19,6 +20,13 @@ Sondes réelles (source à autoriser d'abord ; 1 page par défaut, 5 s entre app
   worker source block <id>
   worker leboncoin --locations 06000,06100 [--max-pages N] [--record <dossier>]
   worker pap --search-urls <url Nice>,<url Saint-Germain> [--max-pages N] [--record <dossier>]`;
+
+/** Garde à côté d'un enregistrement réel la commande et le périmètre, pour pouvoir le rejouer en test. */
+async function saveScope(dir: string | undefined, source: string, scope: object) {
+  if (!dir) return;
+  await mkdir(path.resolve(dir), { recursive: true });
+  await writeFile(path.join(path.resolve(dir), 'scope.json'), `${JSON.stringify({ source, scope, recordedAt: new Date().toISOString() }, null, 2)}\n`);
+}
 
 function print(s: RunSummary) {
   const c = s.counts;
@@ -83,6 +91,7 @@ try {
     const recorder = values.record ? new ResponseRecorder(path.resolve(values.record)) : undefined;
     const transport = values.fixtures ? new AdemeFixtureTransport(path.resolve(values.fixtures)) : new HttpAdemeTransport({ recorder });
     const scope = { inseeCodes: list(values.insee), rawPostalCodes: list(values['postal-raw']), modifiedSince: values.since };
+    if (!values.fixtures) await saveScope(values.record, 'ademe', scope);
     print(await runCollection(db, new AdemeDpeConnector(transport), scope, {
       maxPages: values['max-pages'] ? Number(values['max-pages']) : undefined,
       resumeRunId: values.resume,
@@ -92,9 +101,12 @@ try {
     const maxPages = values['max-pages'] ? Number(values['max-pages']) : 1;
     const http = new GuardedHttpClient({ minIntervalMs: 5000, maxRequests: maxPages, respectRobots: true });
     const recorder = values.record ? new ResponseRecorder(path.resolve(values.record)) : undefined;
+    const lbcScope = { locations: (values.locations ?? '').split(',').filter(Boolean) };
+    const papScope = { searchUrls: (values['search-urls'] ?? '').split(',').filter(Boolean) };
+    await saveScope(values.record, command, command === 'leboncoin' ? lbcScope : papScope);
     const run = command === 'leboncoin'
-      ? runCollection(db, new LeboncoinConnector(new LiveLbcTransport(http, recorder)), { locations: values.locations!.split(',').filter(Boolean) }, { maxPages, resumeRunId: values.resume, retries: 0 })
-      : runCollection(db, new PapConnector(new LivePapTransport(http, recorder)), { searchUrls: values['search-urls']!.split(',').filter(Boolean) }, { maxPages, resumeRunId: values.resume, retries: 0 });
+      ? runCollection(db, new LeboncoinConnector(new LiveLbcTransport(http, recorder)), lbcScope, { maxPages, resumeRunId: values.resume, retries: 0 })
+      : runCollection(db, new PapConnector(new LivePapTransport(http, recorder)), papScope, { maxPages, resumeRunId: values.resume, retries: 0 });
     print(await run);
     console.log(`  requêtes envoyées : ${http.requestsMade}${values.record ? ` · réponses enregistrées dans ${values.record}` : ''}`);
   } else if (command === 'source' && positionals[0] === 'list') {
