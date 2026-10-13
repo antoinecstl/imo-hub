@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { NormalizedDpe } from './dpe.ts';
 import { NormalizedListing } from './listing.ts';
 
 /**
@@ -35,7 +36,9 @@ export type RejectedItem = z.infer<typeof RejectedItem>;
 export const ConnectorResult = z.object({
   status: z.enum(['ok', 'blocked', 'failed']),
   listings: z.array(NormalizedListing),
-  /** Empreinte et extrait minimisé de la donnée brute, indexés par externalId. */
+  /** Diagnostics énergétiques, pour les connecteurs de DPE. */
+  dpeRecords: z.array(NormalizedDpe).optional(),
+  /** Empreinte et extrait minimisé de la donnée brute, indexés par externalId (ou numéro de DPE). */
   raw: z.record(z.object({ hash: z.string(), excerpt: z.unknown().nullable() })),
   rejected: z.array(RejectedItem),
   errors: z.array(ConnectorError),

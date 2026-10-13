@@ -61,7 +61,7 @@ function qs(query: Record<string, string>, patch: Record<string, string | number
   return `?${params.toString()}`;
 }
 
-export function renderTechnicalPage(d: { sources: Row[]; runs: Row[]; completeness: Row[]; listings: Row; query: Record<string, string> }) {
+export function renderTechnicalPage(d: { sources: Row[]; runs: Row[]; completeness: Row[]; listings: Row; dpe: Row[]; query: Record<string, string> }) {
   const sources = d.sources.map((s) => `<tr>
     <td>${esc(s.id)}</td><td>${esc(s.kind)}</td><td>${s.enabled ? 'oui' : 'non'}</td><td>${badge(s.accessStatus)}</td>
     <td class="num">${esc(s.listingCount)}</td><td>${fmtDate(s.lastSeenAt)}</td>
@@ -89,6 +89,10 @@ export function renderTechnicalPage(d: { sources: Row[]; runs: Row[]; completene
     return `<td class="num"><span class="bar" style="width:${pct * 0.6}px"></span> ${pct} %</td>`;
   }).join('')}</tr>`).join('');
 
+  const dpe = d.dpe.map((x) => `<tr><td>${esc(x.inseeCode)}</td><td class="num">${esc(x.total)}</td>
+    <td class="num">${esc(x.notGeocoded)}</td><td class="num">${esc(x.replaced)}</td>
+    <td>${esc(x.lastReceivedAt)}</td><td>${esc(x.lastModifiedAt)}</td></tr>`).join('');
+
   const l = d.listings;
   const listings = (l.items as Row[]).map((x) => `<tr>
     <td><a href="/listings/${esc(x.id)}">${esc(x.externalId)}</a></td><td>${esc(x.sourceId)}</td><td>${esc(x.propertyType)}</td>
@@ -113,7 +117,12 @@ export function renderTechnicalPage(d: { sources: Row[]; runs: Row[]; completene
 <tbody>${runs || '<tr><td colspan="11" class="na">Aucune collecte</td></tr>'}</tbody></table></div>
 <dl class="legend">${Object.entries(STATUS_LABELS).map(([k, v]) => `<dt>${badge(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
 
-<h2>Complétude des champs (état courant)</h2>
+<h2>DPE par commune</h2>
+<div class="scroll"><table><thead><tr><th>Code INSEE</th><th class="num">DPE</th><th class="num">Non géocodés</th><th class="num">Remplacés</th><th>Dernière réception</th><th>Dernière modification</th></tr></thead>
+<tbody>${dpe || '<tr><td colspan="6" class="na">Aucun DPE importé</td></tr>'}</tbody></table></div>
+<p class="lead">Un DPE indique un diagnostic réalisé, pas une intention de vendre. API : <a href="/api/dpe">/api/dpe</a></p>
+
+<h2>Complétude des champs des annonces (état courant)</h2>
 <div class="scroll"><table><thead><tr><th>Champ</th>${[...bySource.keys()].map((s) => `<th class="num">${esc(s)}</th>`).join('')}</tr></thead>
 <tbody>${completeness || '<tr><td class="na">Aucune donnée</td></tr>'}</tbody></table></div>
 
