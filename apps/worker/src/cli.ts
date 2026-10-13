@@ -1,12 +1,13 @@
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { FileImportConnector, FixtureTransport, LeboncoinConnector } from '@imo/connectors';
+import { AdemeDpeConnector, AdemeFixtureTransport, FileImportConnector, FixtureTransport, HttpAdemeTransport, LeboncoinConnector } from '@imo/connectors';
 import { createPool, migrate } from '@imo/db';
 import { runCollection, type RunSummary } from '@imo/domain';
 
 const USAGE = `usage :
   worker import <fichier.csv|json> --source <id> [--name <libellé>] [--observed-at <ISO 8601>] [--exhaustive]
   worker leboncoin-fixtures <dossier> --locations 56000,56860 [--max-pages N] [--resume <runId>]
+  worker ademe --insee 06088,78551 [--postal-raw 06000,06100,78100,78112] [--since YYYY-MM-DD] [--fixtures <dossier>] [--resume <runId>]
 
 Le connecteur Leboncoin n'a pas de transport réel : seules les fixtures hors ligne sont disponibles.`;
 
@@ -32,6 +33,10 @@ const { values, positionals } = parseArgs({
     locations: { type: 'string' },
     'max-pages': { type: 'string' },
     resume: { type: 'string' },
+    insee: { type: 'string' },
+    'postal-raw': { type: 'string' },
+    since: { type: 'string' },
+    fixtures: { type: 'string' },
   },
 });
 
@@ -51,6 +56,14 @@ try {
     const connector = new LeboncoinConnector(new FixtureTransport(path.resolve(positionals[0])));
     const scope = { locations: (values.locations ?? '').split(',').filter(Boolean) };
     print(await runCollection(db, connector, scope, {
+      maxPages: values['max-pages'] ? Number(values['max-pages']) : undefined,
+      resumeRunId: values.resume,
+    }));
+  } else if (command === 'ademe' && values.insee) {
+    const list = (v?: string) => (v ?? '').split(',').map((x) => x.trim()).filter(Boolean);
+    const transport = values.fixtures ? new AdemeFixtureTransport(path.resolve(values.fixtures)) : new HttpAdemeTransport();
+    const scope = { inseeCodes: list(values.insee), rawPostalCodes: list(values['postal-raw']), modifiedSince: values.since };
+    print(await runCollection(db, new AdemeDpeConnector(transport), scope, {
       maxPages: values['max-pages'] ? Number(values['max-pages']) : undefined,
       resumeRunId: values.resume,
     }));
