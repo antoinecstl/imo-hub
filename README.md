@@ -45,6 +45,18 @@ pnpm worker ademe --insee 06088,78551 --postal-raw 06000,06100,06200,06300,78100
 
 L'import ADEME appelle l'API publique `data.ademe.fr` (Licence Ouverte 2.0) : il faut que le réseau l'autorise.
 
+### Tests en conditions réelles
+
+À lancer depuis une machine dont le réseau n'est pas filtré (voir `docs/decisions/0006-tests-reels.md`) :
+
+```bash
+pnpm worker ademe --insee 06088,78551 --postal-raw 06000,06100,06200,06300,78100,78112 --record tests/fixtures/ademe/reel-$(date +%F)
+pnpm worker source authorize leboncoin --note "sonde autorisée par … le …"
+pnpm worker leboncoin --locations 06000 --max-pages 1 --record tests/fixtures/leboncoin/reel-$(date +%F)
+pnpm worker source authorize pap --note "sonde autorisée par … le …"
+pnpm worker pap --search-urls "<URL de recherche PAP copiée du navigateur>" --max-pages 1 --record tests/fixtures/pap/reel-$(date +%F)
+```
+
 Le format d'import est décrit en tête de `packages/connectors/src/file-import/connector.ts`.
 
 ## API
@@ -65,7 +77,7 @@ Le format d'import est décrit en tête de `packages/connectors/src/file-import/
 
 - Démontré hors ligne : normalisation, pagination Leboncoin par pivot, statuts `complete/partial/blocked/failed`,
   rejeu sans doublon, changement de prix, reprise après interruption, isolation des sources, absence de faux retrait.
-- **Non démontré : aucune collecte Leboncoin ni PAP réelle.** Il n'existe pas de transport réel ; voir `docs/decisions/0003-leboncoin.md` et `0005-pap.md`.
+- **Pas encore démontré : collecte Leboncoin ou PAP réelle.** Les sondes réelles existent (voir ci-dessous et `docs/decisions/0006-tests-reels.md`) mais n'ont pas encore été lancées.
 - Import ADEME écrit et testé sur fixtures ; pas encore exécuté sur l'API réelle depuis l'environnement de développement (réseau).
   Premier état des lieux du secteur pilote : `docs/analyses/2026-10-13-ademe-nice-saint-germain.md`.
 - Non commencé : regroupement des biens entre portails (chantier 2), rapprochement DPE ↔ annonces (chantier 3).

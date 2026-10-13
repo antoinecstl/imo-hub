@@ -1,5 +1,5 @@
 import { NormalizedListing, type Connector, type ConnectorResult } from '@imo/contracts';
-import { connectorError, sha256, stableStringify } from '../util.ts';
+import { accessFailure, connectorError, sha256, stableStringify } from '../util.ts';
 import { normalizePapItem, PAP_PARSER_VERSION, PAP_SOURCE_ID, parsePapPage } from './parse.ts';
 import type { PapTransport } from './transport.ts';
 
@@ -42,7 +42,7 @@ export class PapConnector implements Connector<PapScope> {
   }
 
   async health() {
-    return this.transport.live ? { ok: false, detail: 'transport réel non qualifié' } : { ok: true, detail: 'transport de fixtures (hors ligne)' };
+    return this.transport.live ? { ok: false, detail: 'transport réel : soumis à access_status = authorized' } : { ok: true, detail: 'transport de fixtures (hors ligne)' };
   }
 
   async discover(scope: PapScope, cursor: string | null, page: number): Promise<ConnectorResult> {
@@ -54,7 +54,7 @@ export class PapConnector implements Connector<PapScope> {
     try {
       res = await this.transport.get(at.url);
     } catch (err) {
-      return { ...result, status: 'failed', nextCursor: cursor, errors: [connectorError('network', (err as Error).message, page)] };
+      return accessFailure(result, err, cursor, page);
     }
     if (res.status === 401 || res.status === 403) return { ...result, status: 'blocked', nextCursor: cursor, errors: [connectorError('forbidden', `HTTP ${res.status}`, page)] };
     if (res.status === 429) return { ...result, status: 'blocked', nextCursor: cursor, errors: [connectorError('rate_limited', 'HTTP 429 : pause de la source', page)] };

@@ -200,6 +200,10 @@ export async function runCollection<S>(db: Db, connector: Connector<S>, scope: S
   } else {
     status = 'complete';
   }
+  // Un refus ou un challenge sur une source réelle la bloque : il faudra la réautoriser explicitement.
+  if (status === 'blocked' && hitError && connector.capabilities.requiresAuthorizedAccess) {
+    await db.query(`UPDATE sources SET access_status = 'blocked', updated_at = now() WHERE id = $1`, [sourceId]);
+  }
   const exhaustive = status === 'complete' && (await connector.exhaustive(scope));
   const done = await finish(db, run.id, sourceId, status, { blockReason, exhaustive });
 

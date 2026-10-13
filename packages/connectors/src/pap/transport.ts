@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import type { GuardedHttpClient, ResponseRecorder } from '../http/guarded.ts';
 
 export interface PapHttpResponse {
   status: number;
@@ -30,9 +31,20 @@ export class PapFixtureTransport implements PapTransport {
 }
 
 /**
- * Pas de transport réel : l'accès à pap.fr n'est pas qualifié (conditions d'utilisation, droits de
- * réutilisation). Voir docs/decisions/0005-pap.md.
+ * Transport réel vers pap.fr : simple lecture des pages de recherche que l'utilisateur fournit,
+ * avec les garde-fous du client (délai, budget, robots.txt). Voir docs/decisions/0006-tests-reels.md.
  */
-export function createLivePapTransport(): never {
-  throw new Error('Transport PAP réel non disponible : accès non qualifié (voir docs/decisions/0005-pap.md)');
+export class LivePapTransport implements PapTransport {
+  readonly live = true;
+
+  constructor(
+    private readonly http: GuardedHttpClient,
+    private readonly recorder?: ResponseRecorder,
+  ) {}
+
+  async get(url: string): Promise<PapHttpResponse> {
+    const res = await this.http.request(url, { method: 'GET', headers: { accept: 'text/html' } });
+    await this.recorder?.save(url, res);
+    return { status: res.status, contentType: res.contentType, body: res.text };
+  }
 }

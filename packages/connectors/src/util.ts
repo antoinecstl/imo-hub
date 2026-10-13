@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { ConnectorError, ConnectorErrorKind } from '@imo/contracts';
+import { SourceAccessError, type ConnectorError, type ConnectorErrorKind, type ConnectorResult } from '@imo/contracts';
 
 export function sha256(value: string | Buffer): string {
   return createHash('sha256').update(value).digest('hex');
@@ -39,4 +39,11 @@ export function parisLocalToIso(value: unknown): string | null {
   let utc = naive - parisOffsetMinutes(naive) * 60_000;
   utc = naive - parisOffsetMinutes(utc) * 60_000;
   return new Date(utc).toISOString();
+}
+
+/** Traduit une exception de transport en résultat : refus → blocked, le reste → failed. */
+export function accessFailure(result: ConnectorResult, err: unknown, cursor: string | null, page: number): ConnectorResult {
+  const kind = err instanceof SourceAccessError ? err.kind : 'network';
+  const status = err instanceof SourceAccessError && err.blocking ? 'blocked' : 'failed';
+  return { ...result, status, nextCursor: cursor, errors: [connectorError(kind, (err as Error).message, page)] };
 }

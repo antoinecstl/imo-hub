@@ -203,3 +203,19 @@ describe('pipeline d’ingestion', () => {
     expect(await count(db, 'listing_events', "kind = 'reappeared'")).toBe(1);
   });
 });
+
+describe('sources réelles', () => {
+  it('un refus sur une source réelle autorisée la repasse en « blocked »', async () => {
+    const transport = new FixtureTransport(path.join(FIXTURES, 'leboncoin', 'captcha'));
+    Object.defineProperty(transport, 'live', { value: true });
+    await db.query(`INSERT INTO sources (id, name, kind, connector_version, access_status) VALUES ('leboncoin', 'Leboncoin', 'portal', 'x', 'authorized')`);
+    const run = await runCollection(db, new LeboncoinConnector(transport), lbcScope, noWait);
+    expect(run.status).toBe('blocked');
+    const { rows } = await db.query("SELECT access_status FROM sources WHERE id = 'leboncoin'");
+    expect(rows[0].access_status).toBe('blocked');
+    // Relancer ne contacte plus la source tant qu'elle n'est pas réautorisée.
+    const again = await runCollection(db, new LeboncoinConnector(transport), lbcScope, noWait);
+    expect(again.blockReason).toMatch(/access_status=blocked/);
+    expect(transport.requests).toHaveLength(1);
+  });
+});
