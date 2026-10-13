@@ -18,5 +18,7 @@ $W leboncoin-fixtures $F/leboncoin/vannes-3-pages --locations 56000,56860
 $W leboncoin-fixtures $F/leboncoin/vannes-prix-modifie --locations 56000,56860
 echo "== 6. Leboncoin renvoie un CAPTCHA : source bloquée, rien d'autre n'est touché"
 $W leboncoin-fixtures $F/leboncoin/captcha --locations 56000,56860
+echo "== 7. PAP sur fixtures : Nice (2 pages) et Saint-Germain-en-Laye"
+$W pap-fixtures $F/pap/pilote --search-urls https://www.pap.fr/annonce/vente-immobiliere-nice-06-fixture,https://www.pap.fr/annonce/vente-immobiliere-saint-germain-en-laye-78-fixture
 echo
 echo "Page technique : pnpm web, puis http://127.0.0.1:3000/"
