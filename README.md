@@ -15,7 +15,7 @@ pnpm db:up                      # PostgreSQL/PostGIS via Docker (crée aussi imo
 pnpm db:migrate
 pnpm demo                       # import, rejeu, changement de prix, blocage, sur fixtures
 pnpm web                        # page technique : http://127.0.0.1:3000/
-pnpm test                       # 40 tests, sans aucun appel réseau
+pnpm test                       # 48 tests, sans aucun appel réseau
 pnpm typecheck
 ```
 
@@ -26,7 +26,7 @@ Sans Docker : créer les bases `imo` et `imo_test` (rôle `imo`) dans un Postgre
 | Dossier | Rôle |
 |---|---|
 | `packages/contracts` | `NormalizedListing`, `CollectionRun`, `ConnectorResult`, interface `Connector` (zod) |
-| `packages/connectors` | Adaptateur Leboncoin (fixtures uniquement) et import CSV/JSON |
+| `packages/connectors` | Adaptateurs Leboncoin et PAP (fixtures uniquement) et import CSV/JSON |
 | `packages/domain` | Pipeline d'ingestion : idempotence, snapshots, événements, reprise, constat d'absence |
 | `packages/db` | Pool PostgreSQL, migrations SQL |
 | `apps/worker` | CLI de collecte (`pnpm worker …`) |
@@ -39,6 +39,7 @@ Sans Docker : créer les bases `imo` et `imo_test` (rôle `imo`) dans un Postgre
 ```bash
 pnpm worker import fichier.csv --source import-agence --observed-at 2026-10-13T07:00:00+02:00 [--exhaustive]
 pnpm worker leboncoin-fixtures tests/fixtures/leboncoin/vannes-3-pages --locations 56000,56860 [--max-pages N] [--resume <runId>]
+pnpm worker pap-fixtures tests/fixtures/pap/pilote --search-urls <url Nice>,<url Saint-Germain> [--max-pages N] [--resume <runId>]
 pnpm worker ademe --insee 06088,78551 --postal-raw 06000,06100,06200,06300,78100,78112 [--since YYYY-MM-DD] [--fixtures <dossier>]
 ```
 
@@ -64,7 +65,7 @@ Le format d'import est décrit en tête de `packages/connectors/src/file-import/
 
 - Démontré hors ligne : normalisation, pagination Leboncoin par pivot, statuts `complete/partial/blocked/failed`,
   rejeu sans doublon, changement de prix, reprise après interruption, isolation des sources, absence de faux retrait.
-- **Non démontré : aucune collecte Leboncoin réelle.** Il n'existe pas de transport réel ; voir `docs/decisions/0003-leboncoin.md`.
+- **Non démontré : aucune collecte Leboncoin ni PAP réelle.** Il n'existe pas de transport réel ; voir `docs/decisions/0003-leboncoin.md` et `0005-pap.md`.
 - Import ADEME écrit et testé sur fixtures ; pas encore exécuté sur l'API réelle depuis l'environnement de développement (réseau).
   Premier état des lieux du secteur pilote : `docs/analyses/2026-10-13-ademe-nice-saint-germain.md`.
-- Non commencé : second connecteur d'annonces, regroupement des biens (chantier 2), rapprochement DPE ↔ annonces (chantier 3).
+- Non commencé : regroupement des biens entre portails (chantier 2), rapprochement DPE ↔ annonces (chantier 3).

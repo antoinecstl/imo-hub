@@ -1,0 +1,15 @@
+{
+  "https://www.pap.fr/challenge": {
+    "file": "challenge.html"
+  },
+  "https://www.pap.fr/sans-json-ld": {
+    "file": "sans-json-ld.html"
+  },
+  "https://www.pap.fr/vide": {
+    "file": "vide.html"
+  },
+  "https://www.pap.fr/interdit": {
+    "file": "challenge.html",
+    "status": 403
+  }
+}

@@ -6,3 +6,6 @@ export * from './leboncoin/connector.ts';
 export * from './file-import/connector.ts';
 export * from './ademe/transport.ts';
 export * from './ademe/connector.ts';
+export * from './pap/transport.ts';
+export * from './pap/parse.ts';
+export * from './pap/connector.ts';
