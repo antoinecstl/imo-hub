@@ -1,0 +1,127 @@
+{
+  "total": 6,
+  "total_all": 6,
+  "total_pro": 1,
+  "total_private": 5,
+  "max_pages": 3,
+  "referrer_id": "fixture",
+  "human_readable_applied_condition": "fixture synthétique",
+  "ads": [
+    {
+      "list_id": 900000001,
+      "first_publication_date": "2026-10-01 09:12:44",
+      "index_date": "2026-10-01 09:12:44",
+      "status": "active",
+      "category_id": "9",
+      "category_name": "Ventes immobilières",
+      "subject": "Maison 5 pièces avec jardin",
+      "body": "Annonce synthétique de test n°900000001. Aucune donnée réelle.",
+      "ad_type": "offer",
+      "url": "https://www.leboncoin.fr/ad/ventes_immobilieres/900000001",
+      "price": [
+        385000
+      ],
+      "attributes": [
+        {
+          "key": "real_estate_type",
+          "value": "1",
+          "value_label": "Maison"
+        },
+        {
+          "key": "square",
+          "value": "112",
+          "value_label": "112 m²"
+        },
+        {
+          "key": "land_plot_surface",
+          "value": "540",
+          "value_label": "540 m²"
+        },
+        {
+          "key": "rooms",
+          "value": "5",
+          "value_label": "5"
+        },
+        {
+          "key": "energy_rate",
+          "value": "d",
+          "value_label": "D"
+        },
+        {
+          "key": "ges",
+          "value": "b",
+          "value_label": "B"
+        }
+      ],
+      "location": {
+        "city": "Vannes",
+        "city_label": "Vannes 56000",
+        "zipcode": "56000",
+        "lat": 47.6582,
+        "lng": -2.7608,
+        "is_shape": true
+      },
+      "owner": {
+        "type": "private",
+        "name": "Vendeur fictif"
+      },
+      "has_phone": true
+    },
+    {
+      "list_id": 900000002,
+      "first_publication_date": "2026-10-01 09:12:44",
+      "index_date": "2026-10-01 09:12:44",
+      "status": "active",
+      "category_id": "9",
+      "category_name": "Ventes immobilières",
+      "subject": "Appartement T3 centre",
+      "body": "Annonce synthétique de test n°900000002. Aucune donnée réelle.",
+      "ad_type": "offer",
+      "url": "https://www.leboncoin.fr/ad/ventes_immobilieres/900000002",
+      "price": [
+        229000
+      ],
+      "attributes": [
+        {
+          "key": "real_estate_type",
+          "value": "2",
+          "value_label": "Appartement"
+        },
+        {
+          "key": "square",
+          "value": "68",
+          "value_label": "68 m²"
+        },
+        {
+          "key": "rooms",
+          "value": "3",
+          "value_label": "3"
+        },
+        {
+          "key": "energy_rate",
+          "value": "c",
+          "value_label": "C"
+        },
+        {
+          "key": "ges",
+          "value": "a",
+          "value_label": "A"
+        }
+      ],
+      "location": {
+        "city": "Vannes",
+        "city_label": "Vannes 56000",
+        "zipcode": "56000",
+        "lat": 47.6559,
+        "lng": -2.7574,
+        "is_shape": true
+      },
+      "owner": {
+        "type": "private",
+        "name": "Vendeur fictif"
+      },
+      "has_phone": false
+    }
+  ],
+  "pivot": "pivot-page-2"
+}

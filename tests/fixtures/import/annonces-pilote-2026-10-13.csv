@@ -1,0 +1,5 @@
+external_id,source_url,transaction_type,property_type,seller_type,title,description,price,currency,surface_value,surface_kind,land_surface,rooms,bedrooms,city,postal_code,insee_code,address_text,latitude,longitude,location_precision,energy_class,energy_value,ges_class,ges_value,dpe_number,source_published_at,source_updated_at
+AG-0001,,sale,house,private,Longère à restaurer,Exemple synthétique : longère en pierre avec dépendance.,295000,EUR,140,living,2100,6,4,Theix-Noyalo,56450,56251,,47.6283,-2.6603,city,F,358,D,52,,2026-10-02T08:00:00+02:00,
+AG-0002,,sale,apartment,private,T4 avec balcon,Exemple synthétique : quatrième étage avec ascenseur.,262000,EUR,81.5,carrez,,4,3,Vannes,56000,56260,12 rue Exemple,47.6571,-2.7591,street,D,212,B,9,2356E1234567X,2026-10-05T10:30:00+02:00,
+AG-0003,,sale,house,professional,Maison familiale,Exemple synthétique : annonce d'agence.,410000,EUR,128,living,600,6,4,Séné,56860,56243,,,,,C,140,A,4,,2026-09-30T14:00:00+02:00,
+AG-0004,,sale,apartment,private,Studio étudiant,Exemple synthétique : informations énergétiques non communiquées.,98000,EUR,24,living,,1,0,Vannes,56000,56260,,,,city,,,,,,,

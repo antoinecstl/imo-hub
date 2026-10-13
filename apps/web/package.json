@@ -1,0 +1,8 @@
+{
+  "name": "@imo/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/app.ts" },
+  "dependencies": { "@imo/contracts": "workspace:*", "@imo/db": "workspace:*", "fastify": "^5.2.0", "zod": "^3.24.1" }
+}

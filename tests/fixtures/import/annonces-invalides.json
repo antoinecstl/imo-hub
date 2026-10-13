@@ -1,0 +1,11 @@
+{
+  "observed_at": "2026-10-13T07:00:00+02:00",
+  "exhaustive": false,
+  "listings": [
+    { "external_id": "AG-0101", "transaction_type": "sale", "property_type": "house", "price": 320000, "currency": "EUR", "city": "Vannes", "postal_code": "56000" },
+    { "external_id": "", "price": 150000, "currency": "EUR" },
+    { "external_id": "AG-0103", "price": "trois cent mille", "currency": "EUR" },
+    { "external_id": "AG-0104", "price": 180000 },
+    { "external_id": "AG-0105", "energy_class": "H" }
+  ]
+}

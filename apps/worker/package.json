@@ -1,0 +1,7 @@
+{
+  "name": "@imo/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": { "@imo/contracts": "workspace:*", "@imo/connectors": "workspace:*", "@imo/db": "workspace:*", "@imo/domain": "workspace:*" }
+}

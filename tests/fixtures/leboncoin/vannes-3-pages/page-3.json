@@ -1,0 +1,99 @@
+{
+  "total": 6,
+  "total_all": 6,
+  "total_pro": 1,
+  "total_private": 5,
+  "max_pages": 3,
+  "referrer_id": "fixture",
+  "human_readable_applied_condition": "fixture synthétique",
+  "ads": [
+    {
+      "list_id": 900000005,
+      "first_publication_date": "2026-10-01 09:12:44",
+      "index_date": "2026-10-01 09:12:44",
+      "status": "active",
+      "category_id": "9",
+      "category_name": "Ventes immobilières",
+      "subject": "Terrain constructible",
+      "body": "Annonce synthétique de test n°900000005. Aucune donnée réelle.",
+      "ad_type": "offer",
+      "url": "https://www.leboncoin.fr/ad/ventes_immobilieres/900000005",
+      "price": [
+        99000
+      ],
+      "attributes": [
+        {
+          "key": "real_estate_type",
+          "value": "3",
+          "value_label": "Autre"
+        }
+      ],
+      "location": {
+        "city": "Séné",
+        "city_label": "Séné 56860",
+        "zipcode": "56860",
+        "lat": 47.6052,
+        "lng": -2.729,
+        "is_shape": true
+      },
+      "owner": {
+        "type": "private",
+        "name": "Vendeur fictif"
+      },
+      "has_phone": true
+    },
+    {
+      "list_id": 900000006,
+      "first_publication_date": "2026-10-01 09:12:44",
+      "index_date": "2026-10-01 09:12:44",
+      "status": "active",
+      "category_id": "9",
+      "category_name": "Ventes immobilières",
+      "subject": "Maison de bourg",
+      "body": "Annonce synthétique de test n°900000006. Aucune donnée réelle.",
+      "ad_type": "offer",
+      "url": "https://www.leboncoin.fr/ad/ventes_immobilieres/900000006",
+      "price": [],
+      "attributes": [
+        {
+          "key": "real_estate_type",
+          "value": "1",
+          "value_label": "Maison"
+        },
+        {
+          "key": "square",
+          "value": "95",
+          "value_label": "95 m²"
+        },
+        {
+          "key": "rooms",
+          "value": "4",
+          "value_label": "4"
+        },
+        {
+          "key": "energy_rate",
+          "value": "f",
+          "value_label": "F"
+        },
+        {
+          "key": "ges",
+          "value": "f",
+          "value_label": "F"
+        }
+      ],
+      "location": {
+        "city": "Séné",
+        "city_label": "Séné 56860",
+        "zipcode": "56860",
+        "lat": 47.6201,
+        "lng": -2.7401,
+        "is_shape": true
+      },
+      "owner": {
+        "type": "private",
+        "name": "Vendeur fictif"
+      },
+      "has_phone": true
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "total": 6,
+  "total_all": 6,
+  "total_pro": 1,
+  "total_private": 5,
+  "max_pages": 3,
+  "referrer_id": "fixture",
+  "human_readable_applied_condition": "fixture synthétique",
+  "ads": [
+    {
+      "list_id": 900000002,
+      "first_publication_date": "2026-10-01 09:12:44",
+      "index_date": "2026-10-01 09:12:44",
+      "status": "active",
+      "category_id": "9",
+      "category_name": "Ventes immobilières",
+      "subject": "Appartement T3 centre",
+      "body": "Annonce synthétique de test n°900000002. Aucune donnée réelle.",
+      "ad_type": "offer",
+      "url": "https://www.leboncoin.fr/ad/ventes_immobilieres/900000002",
+      "price": [
+        229000
+      ],
+      "attributes": [
+        {
+          "key": "real_estate_type",
+          "value": "2",
+          "value_label": "Appartement"
+        },
+        {
+          "key": "square",
+          "value": "68",
+          "value_label": "68 m²"
+        },
+        {
+          "key": "rooms",
+          "value": "3",
+          "value_label": "3"
+        },
+        {
+          "key": "energy_rate",
+          "value": "c",
+          "value_label": "C"
+        },
+        {
+          "key": "ges",
+          "value": "a",
+          "value_label": "A"
+        }
+      ],
+      "location": {
+        "city": "Vannes",
+        "city_label": "Vannes 56000",
+        "zipcode": "56000",
+        "lat": 47.6559,
+        "lng": -2.7574,
+        "is_shape": true
+      },
+      "owner": {
+        "type": "private",
+        "name": "Vendeur fictif"
+      },
+      "has_phone": false
+    },
+    {
+      "list_id": 900000003,
+      "first_publication_date": "2026-10-01 09:12:44",
+      "index_date": "2026-10-01 09:12:44",
+      "status": "active",
+      "category_id": "9",
+      "category_name": "Ventes immobilières",
+      "subject": "Appartement T2 proche gare",
+      "body": "Annonce synthétique de test n°900000003. Aucune donnée réelle.",
+      "ad_type": "offer",
+      "url": "https://www.leboncoin.fr/ad/ventes_immobilieres/900000003",
+      "price": [
+        168000
+      ],
+      "attributes": [
+        {
+          "key": "real_estate_type",
+          "value": "2",
+          "value_label": "Appartement"
+        },
+        {
+          "key": "square",
+          "value": "44",
+          "value_label": "44 m²"
+        },
+        {
+          "key": "rooms",
+          "value": "2",
+          "value_label": "2"
+        },
+        {
+          "key": "energy_rate",
+          "value": "e",
+          "value_label": "E"
+        },
+        {
+          "key": "ges",
+          "value": "e",
+          "value_label": "E"
+        }
+      ],
+      "location": {
+        "city": "Vannes",
+        "city_label": "Vannes 56000",
+        "zipcode": "56000",
+        "lat": 47.6633,
+        "lng": -2.752,
+        "is_shape": true
+      },
+      "owner": {
+        "type": "pro",
+        "name": "Vendeur fictif"
+      },
+      "has_phone": true
+    },
+    {
+      "list_id": 900000004,
+      "first_publication_date": "2026-09-28 18:03:10",
+      "index_date": "2026-09-28 18:03:10",
+      "status": "active",
+      "category_id": "9",
+      "category_name": "Ventes immobilières",
+      "subject": "Maison à rénover",
+      "body": "Annonce synthétique de test n°900000004. Aucune donnée réelle.",
+      "ad_type": "offer",
+      "url": "https://www.leboncoin.fr/ad/ventes_immobilieres/900000004",
+      "price": [
+        210000
+      ],
+      "attributes": [
+        {
+          "key": "real_estate_type",
+          "value": "1",
+          "value_label": "Maison"
+        },
+        {
+          "key": "rooms",
+          "value": "4",
+          "value_label": "4"
+        },
+        {
+          "key": "energy_rate",
+          "value": "v",
+          "value_label": "V"
+        }
+      ],
+      "location": {
+        "city": "Séné",
+        "city_label": "Séné 56860",
+        "zipcode": "56860",
+        "lat": 47.619,
+        "lng": -2.7366,
+        "is_shape": true
+      },
+      "owner": {
+        "type": "private",
+        "name": "Vendeur fictif"
+      },
+      "has_phone": true
+    }
+  ],
+  "pivot": "pivot-page-3"
+}
