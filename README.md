@@ -57,6 +57,10 @@ pnpm worker source authorize pap --note "sonde autorisée par … le …"
 pnpm worker pap --search-urls "<URL de recherche PAP copiée du navigateur>" --max-pages 1 --record tests/fixtures/pap/reel-$(date +%F)
 ```
 
+`--record` enregistre aussi `scope.json` ; `pnpm test:reel` rejoue ensuite chaque enregistrement dans le pipeline
+(format lu, moins de 5 % de rejets, rejeu sans doublon). Pour tout faire avec Claude Code sur sa propre machine :
+cloner le dépôt, ouvrir Claude Code dedans et lui demander « lance la mission tests réels » (voir `CLAUDE.md`).
+
 Le format d'import est décrit en tête de `packages/connectors/src/file-import/connector.ts`.
 
 ## API

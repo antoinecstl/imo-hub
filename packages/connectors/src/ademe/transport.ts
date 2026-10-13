@@ -57,9 +57,20 @@ export class AdemeFixtureTransport implements AdemeTransport {
 
   async get(url: string): Promise<AdemeHttpResponse> {
     this.urls.push(url);
-    const index = JSON.parse(await readFile(path.join(this.dir, 'index.json'), 'utf8')) as Record<string, { file: string; status?: number }>;
+    const index = JSON.parse(await readFile(path.join(this.dir, 'index.json'), 'utf8')) as Record<string, { file: string; status?: number; contentType?: string }>;
     const entry = index[url] ?? (this.urls.length === 1 ? index.__first__ : undefined);
     if (!entry) throw new Error(`fixture absente pour ${url}`);
-    return { status: entry.status ?? 200, contentType: 'application/json', body: JSON.parse(await readFile(path.join(this.dir, entry.file), 'utf8')) };
+    // Les réponses enregistrées en réel peuvent être du HTML (erreur, quota) : on garde leur type d'origine.
+    const contentType = entry.contentType ?? 'application/json';
+    const raw = await readFile(path.join(this.dir, entry.file), 'utf8');
+    let body: unknown = raw;
+    if (contentType.includes('json')) {
+      try {
+        body = JSON.parse(raw);
+      } catch {
+        body = null;
+      }
+    }
+    return { status: entry.status ?? 200, contentType, body };
   }
 }
