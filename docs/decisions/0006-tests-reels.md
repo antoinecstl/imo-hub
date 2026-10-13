@@ -21,7 +21,11 @@ l'environnement cloud de développement bloque `data.ademe.fr`, et aucune requê
    (`index.json` + fichiers). On la rejoue ensuite dans les tests : le format testé devient le format réel.
    Les enregistrements contiennent des données personnelles possibles (textes d'annonces) : ils restent hors Git
    (`tests/fixtures/**/reel-*` est ignoré) tant qu'ils ne sont pas minimisés.
-5. **ADEME** : données ouvertes, source autorisée d'office ; `worker ademe … --record <dossier>`.
+5. **Rejeu** : `--record` écrit aussi `scope.json` ; `pnpm test:reel` rejoue chaque dossier `reel-*` dans le pipeline
+   (aucune erreur de schéma, moins de 5 % de rejets, rejeu sans doublon ; une source bloquée est acceptée comme résultat).
+6. **Exécution locale guidée** : `CLAUDE.md` décrit la « mission tests réels » pour une session Claude Code sur le poste
+   de l'utilisateur, qui rapporte ses résultats par une pull request (`docs/analyses/<date>-tests-reels.md`).
+7. **ADEME** : données ouvertes, source autorisée d'office ; `worker ademe … --record <dossier>`.
 
 ## Ce que la sonde peut conclure
 - `complete`/`partial` avec annonces : le format réel est lu ; comparer aux hypothèses et corriger `parse.ts`/`normalize.ts`.

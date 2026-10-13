@@ -12,6 +12,7 @@
     "worker": "tsx apps/worker/src/cli.ts",
     "web": "tsx apps/web/src/server.ts",
     "test": "vitest run",
+    "test:reel": "vitest run tests/integration/reel.test.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "demo": "bash scripts/demo.sh"
   },
